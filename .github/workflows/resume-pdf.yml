@@ -5,6 +5,7 @@ on:
     branches: [ main ]
     paths:
       - "resume.ja.md"
+      - ".github/workflows/resume-pdf.yml"  # Trigger on workflow updates too
   workflow_dispatch:
 
 permissions:
@@ -20,7 +21,24 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install Pandoc & TeX (XeLaTeX) & JP fonts
+      # 1) Font setup: Download and install Noto Sans JP from Google Fonts
+      - name: Install Noto Sans JP font (Google Fonts)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y unzip fontconfig
+          mkdir -p /tmp/fonts && cd /tmp/fonts
+          # Official distribution ZIP (follow redirects)
+          curl -L "https://fonts.google.com/download?family=Noto%20Sans%20JP" -o noto-sans-jp.zip
+          unzip -q noto-sans-jp.zip -d NotoSansJP
+          # Place OTF/TTF files in user font directory
+          mkdir -p ~/.local/share/fonts/NotoSansJP
+          find NotoSansJP -type f \( -iname "*.otf" -o -iname "*.ttf" \) -exec cp {} ~/.local/share/fonts/NotoSansJP/ \;
+          fc-cache -f -v
+          # Verify installation (output font names in log)
+          fc-list | grep -i "Noto Sans JP" || true
+
+      # 2) Pandoc & TeX environment
+      - name: Install Pandoc & TeX (XeLaTeX)
         run: |
           sudo apt-get update
           sudo apt-get install -y \
@@ -28,21 +46,22 @@ jobs:
             texlive-latex-recommended \
             texlive-latex-extra \
             texlive-xetex \
-            texlive-fonts-recommended \
-            fonts-noto \
-            fonts-noto-cjk
+            texlive-fonts-recommended
 
-      - name: Convert resume.ja.md -> resume.ja.pdf
+      # 3) Convert (Noto Sans JP + enable hyperlinks)
+      - name: Convert resume.ja.md -> resume.ja.pdf (Noto Sans JP, hyperlinks)
         run: |
           pandoc resume.ja.md -o resume.ja.pdf \
             --pdf-engine=xelatex \
             -V mainfont="Noto Sans JP" \
-            -V geometry:margin=20mm
+            -V geometry=margin=20mm \
+            -V colorlinks=true \
+            -V urlcolor=blue
 
+      # 4) Commit
       - name: Commit PDF
         uses: EndBug/add-and-commit@v9
         with:
           add: "resume.ja.pdf"
-          message: "chore(pdf): auto-build resume.ja.pdf from resume.ja.md"
+          message: "chore(pdf): auto-build resume.ja.pdf from resume.ja.md (Noto Sans JP, links enabled)"
           default_author: github_actions
-          push: true
