@@ -5,7 +5,7 @@ on:
     branches: [ main ]
     paths:
       - "resume.ja.md"
-      - ".github/workflows/resume-pdf.yml"  # Trigger on workflow updates too
+      - ".github/workflows/resume-pdf.yml"
   workflow_dispatch:
 
 permissions:
@@ -21,21 +21,18 @@ jobs:
         with:
           fetch-depth: 0
 
-      # 1) Font setup: Download and install Noto Sans JP from Google Fonts
-      - name: Install Noto Sans JP font (Google Fonts)
+      # 1) Install fonts: Download Noto Sans JP from official GitHub notofonts/noto-cjk
+      - name: Install Noto Sans JP font (from GitHub)
         run: |
           sudo apt-get update
-          sudo apt-get install -y unzip fontconfig
-          mkdir -p /tmp/fonts && cd /tmp/fonts
-          # Official distribution ZIP (follow redirects)
-          curl -L "https://fonts.google.com/download?family=Noto%20Sans%20JP" -o noto-sans-jp.zip
-          unzip -q noto-sans-jp.zip -d NotoSansJP
-          # Place OTF/TTF files in user font directory
+          sudo apt-get install -y fontconfig curl
           mkdir -p ~/.local/share/fonts/NotoSansJP
-          find NotoSansJP -type f \( -iname "*.otf" -o -iname "*.ttf" \) -exec cp {} ~/.local/share/fonts/NotoSansJP/ \;
+          cd ~/.local/share/fonts/NotoSansJP
+          curl -L -O https://github.com/notofonts/noto-cjk/raw/main/Sans/OTF/Japanese/NotoSansJP-Regular.otf
+          curl -L -O https://github.com/notofonts/noto-cjk/raw/main/Sans/OTF/Japanese/NotoSansJP-Bold.otf
           fc-cache -f -v
-          # Verify installation (output font names in log)
-          fc-list | grep -i "Noto Sans JP" || true
+          # Verification log
+          fc-list | grep "Noto Sans JP" || true
 
       # 2) Pandoc & TeX environment
       - name: Install Pandoc & TeX (XeLaTeX)
@@ -48,7 +45,7 @@ jobs:
             texlive-xetex \
             texlive-fonts-recommended
 
-      # 3) Convert (Noto Sans JP + enable hyperlinks)
+      # 3) PDF conversion
       - name: Convert resume.ja.md -> resume.ja.pdf (Noto Sans JP, hyperlinks)
         run: |
           pandoc resume.ja.md -o resume.ja.pdf \
