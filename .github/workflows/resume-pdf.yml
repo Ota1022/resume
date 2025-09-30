@@ -21,20 +21,25 @@ jobs:
         with:
           fetch-depth: 0
 
-      # 1) Install fonts: Download Noto Sans JP from official GitHub notofonts/noto-cjk
-      - name: Install Noto Sans JP font (from GitHub)
+      # 1) Install Noto Sans JP system-wide (Official Google fonts repository)
+      - name: Install Noto Sans JP (static TTFs)
         run: |
+          set -e
           sudo apt-get update
-          sudo apt-get install -y fontconfig curl
-          mkdir -p ~/.local/share/fonts/NotoSansJP
-          cd ~/.local/share/fonts/NotoSansJP
-          curl -L -O https://github.com/notofonts/noto-cjk/raw/main/Sans/OTF/Japanese/NotoSansJP-Regular.otf
-          curl -L -O https://github.com/notofonts/noto-cjk/raw/main/Sans/OTF/Japanese/NotoSansJP-Bold.otf
-          fc-cache -f -v
-          # Verification log
-          fc-list | grep "Noto Sans JP" || true
+          sudo apt-get install -y curl fontconfig
+          sudo mkdir -p /usr/share/fonts/truetype/NotoSansJP
+          cd /usr/share/fonts/truetype/NotoSansJP
+          # Static TTF files (individual TTFs for each weight, not variable fonts)
+          sudo curl -L -O https://github.com/google/fonts/raw/main/ofl/notosansjp/NotoSansJP-Thin.ttf
+          sudo curl -L -O https://github.com/google/fonts/raw/main/ofl/notosansjp/NotoSansJP-Light.ttf
+          sudo curl -L -O https://github.com/google/fonts/raw/main/ofl/notosansjp/NotoSansJP-Regular.ttf
+          sudo curl -L -O https://github.com/google/fonts/raw/main/ofl/notosansjp/NotoSansJP-Medium.ttf
+          sudo curl -L -O https://github.com/google/fonts/raw/main/ofl/notosansjp/NotoSansJP-Bold.ttf
+          sudo curl -L -O https://github.com/google/fonts/raw/main/ofl/notosansjp/NotoSansJP-Black.ttf
+          sudo fc-cache -f -v
+          fc-list | grep -i "Noto Sans JP" || true
 
-      # 2) Pandoc & TeX environment
+      # 2) Install Pandoc & TeX
       - name: Install Pandoc & TeX (XeLaTeX)
         run: |
           sudo apt-get update
@@ -43,22 +48,38 @@ jobs:
             texlive-latex-recommended \
             texlive-latex-extra \
             texlive-xetex \
-            texlive-fonts-recommended
+            texlive-fonts-recommended \
+            fonts-noto-cjk
 
-      # 3) PDF conversion
-      - name: Convert resume.ja.md -> resume.ja.pdf (Noto Sans JP, hyperlinks)
+      # 3) Auto-resolve font family (fallback to CJK if JP not found)
+      - name: Resolve font family
+        id: font
         run: |
+          if fc-list | grep -qi "Noto Sans JP"; then
+            echo "FONT_FAMILY=Noto Sans JP" >> "$GITHUB_ENV"
+            echo "family=Noto Sans JP" >> "$GITHUB_OUTPUT"
+          else
+            echo "FONT_FAMILY=Noto Sans CJK JP" >> "$GITHUB_ENV"
+            echo "family=Noto Sans CJK JP" >> "$GITHUB_OUTPUT"
+          fi
+          echo "Using font family: ${{ steps.font.outputs.family }}"
+
+      # 4) Convert with hyperlinks enabled
+      - name: Convert resume.ja.md -> resume.ja.pdf (hyperlinks on)
+        run: |
+          set -e
           pandoc resume.ja.md -o resume.ja.pdf \
             --pdf-engine=xelatex \
-            -V mainfont="Noto Sans JP" \
+            -V mainfont="${FONT_FAMILY}" \
             -V geometry=margin=20mm \
             -V colorlinks=true \
             -V urlcolor=blue
 
-      # 4) Commit
+      # 5) Commit changes
       - name: Commit PDF
         uses: EndBug/add-and-commit@v9
         with:
           add: "resume.ja.pdf"
-          message: "chore(pdf): auto-build resume.ja.pdf from resume.ja.md (Noto Sans JP, links enabled)"
+          message: "chore(pdf): auto-build resume.ja.pdf from resume.ja.md (${{
+            steps.font.outputs.family }}, links enabled)"
           default_author: github_actions
