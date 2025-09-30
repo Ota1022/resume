@@ -1,6 +1,6 @@
 # 職務経歴書
 
-2025年6月現在
+2025年9月現在
 
 太田 暢 (Itaru Ota)
 
@@ -18,7 +18,7 @@
   * Jest, PyTestを使ったテスト環境の構築
   * GitHub Actions, Docker Composeを用いたCI/CD環境の構築
 * クラウド・コンテナ技術の活用
-  * AWS Lambda, S3, Amplifyの構築・運用経験
+  * AWS Lambda, ECS, S3, SQS, Amplifyを用いたソフトウェア構築・運用経験
   * Google Cloud Cloud Runを使ったコンテナアプリケーションの運用
   * Dockerを使った開発環境の構築とコンテナ化
 * AI・機械学習・自然言語処理の実装経験
@@ -43,8 +43,6 @@
 * DDD・アジャイル開発手法による拡張性・保守性の高いシステム設計
 * CI/CDパイプライン構築による開発プロセスの自動化・効率化
 * 新技術の検証（PoC）と実用的なソリューションへの落とし込み
-
-<div class="page"/>
 
 ## 職務経歴
 
@@ -86,8 +84,6 @@
 * インシデント報告電話システムの要件定義・顧客ヒアリング実施
 * Amazon Connectでの連絡先別/時間帯別電話ルーティングフローの設計・実装
 * 固定電話からCTIシステムへの移行による業務効率化達成
-
-<div class="page"/>
 
 #### 施設管理会社向けインシデント報告システム更改
 
@@ -139,8 +135,6 @@
 * CLI引数の追加とリファクタリングにより、様々な入力形式への対応を実現
 * Dockerコンテナ化とSQLiteデータベース構築により、環境依存性を解消
 
-<div class="page"/>
-
 ## 個人開発
 
 ### [momen.ai - 衝突原因レコメンドWebアプリ](https://github.com/MapGeoSafari/momenai)
@@ -169,8 +163,10 @@
 * 文章構造・内容に基づく多様な言語指標の計算機能実装
 * GitHubでのOSS開発とPyPIへの公開
 
-## 執筆・発表
+## 発表
 
+* [3-shake SRE Tech Talk LT登壇](https://speakerdeck.com/ota1022/github-actions-x-aws-oidclian-xi-noshi-zu-mitojing-wei-woli-jie-suru) 2025年9月
+* [JAWS-UGコンテナ支部 LT登壇](https://speakerdeck.com/ota1022/dockerkaraecshe-awsnohai-nichu-ruqian-nizhi-tuteokitaikoto) 2025年8月
 * [Qiita主催イベント「Bash 最近ハマっている生成AI活用法を語ろう！」LT登壇](https://speakerdeck.com/ota1022/aikodoedeitahakai-fa-wobian-eruka-cursorwotimunidao-ru-site1keyue-jing-tutaben-yin) 2025年5月
 * 第15回データ工学と情報マネジメントに関するフォーラム（DEIM2023）発表 2023年
 * 第14回データ工学と情報マネジメントに関するフォーラム（DEIM2022）発表・学生プレゼンテーション賞受賞 2022年
@@ -178,11 +174,10 @@
 ## 資格
 
 * [AWS認定資格](https://www.credly.com/users/itaru-ota) (CLF, AIF, SAA, DVA, SOA, DEA, MLA, SAP, SCS, DAS, MLS) 2023-2025年
-* Google Cloud Associate Cloud Engineer 2025年
+* Google Cloud (Associate Cloud Engineer, Generative AI Leader) 2025年
 * 応用情報技術者試験 2023年
 * 基本情報技術者試験 2023年
 * TOEIC Score 865 2023年
-
 
 ## 学歴
 
